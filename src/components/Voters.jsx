@@ -1,47 +1,74 @@
 import moment from 'moment'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Avatar from 'react-avatar'
 import { Link, useParams } from 'react-router-dom'
+import { listVoters } from '../Blockchain.services'
 
 const Voters = () => {
-    const [voters, setVoters] = useState([])
-    const [data, setData] = useState([])
-    const { id } = useParams()
-    const timeAgo = (timestamp) => moment(Number(timestamp + '000')).fromNow()
+    const [voters, setVoters] = useState([]);
+  const [data, setData] = useState([]);
+  const [selectedButton, setSelectedButton] = useState('all');
+  const { id } = useParams();
+  const timeAgo = (timestamp) => moment(Number(timestamp + '000')).fromNow();
 
-    useEffect(async () => {
-        await listVoters(id).then((res) => {
-            setVoters(res)
-            setData(res)
-        })
-    }, [id])
+  useEffect(async () => {
+    await listVoters(id).then((res) => {
+      setVoters(res);
+      setData(res);
+    });
+  }, [id]);
 
-    const getAll = () => setVoters(data)
-    const getAccepted = () => setVoters(data.filter((vote) => vote.choosen))
-    const getRejected = () => setVoters(data.filter((vote) => !vote.choosen))
+  const getAll = () => {
+    setVoters(data);
+    setSelectedButton('all');
+  };
 
+  const getAccepted = () => {
+    setVoters(data.filter((vote) => vote.choosen));
+    setSelectedButton('acceptees');
+  };
 
-    const active = ` bg-blue-600 inline-block px-6 py-2.5  dark:border
+  const getRejected = () => {
+    setVoters(data.filter((vote) => !vote.choosen));
+    setSelectedButton('rejectees');
+  };
+
+  const active = ` bg-blue-600 inline-block px-6 py-2.5  dark:border
     text-white font-medium text-xs leading-tight uppercase
        dark:shadow-transparent hover:bg-blue-700 hover:dark:border-white transition
-       duration-150 ease-in-out border-blue-600 hover:dark:text-white border border-blue-600`
-   
-       const deactive = `dark:bg-transparent inline-block px-6 py-2.5  dark:border
+       duration-150 ease-in-out border-blue-600  hover:dark:text-white border border-blue-600`;
+
+  const deactive = `dark:bg-transparent inline-block px-6 py-2.5  dark:border
        text-blue-600 border border-blue-600 font-medium text-xs leading-tight uppercase dark:shadow-transparent hover:bg-blue-600 dark:hover:bg-blue-600 transition
-       duration-150 ease-in-out border-blue-600 hover:dark:text-white dark:border-blue-500 dark:text-blue-600 dark:text-blue-600`
-   
+       duration-150 ease-in-out border-blue-600 hover:text-white hover:dark:text-white dark:border-blue-500 dark:text-blue-600 dark:text-blue-600`;
+
   return (
-      <div className="flex flex-col p-8">
-           <div className="flex justify-center items-center" role="group">
-              <button onClick={getAll} className={`rounded-l-full ${active}`}>
-                  All
-              </button>
-              <button onClick={getAccepted} className={`${deactive}`}>
-                  Acceptees
-              </button>
-              <button onClick={getRejected} className={`rounded-r-full ${deactive}`}>
-                  Rejectees
-              </button>
+    <div className="flex flex-col p-8">
+      <div className="flex justify-center items-center" role="group">
+        <button
+          onClick={getAll}
+          className={`rounded-l-full ${
+            selectedButton === 'all' ? active : deactive
+          }`}
+        >
+          All
+        </button>
+        <button
+          onClick={getAccepted}
+          className={`${deactive} ${
+            selectedButton === 'acceptees' ? active : ''
+          }`}
+        >
+          Acceptees
+        </button>
+        <button
+          onClick={getRejected}
+          className={`rounded-r-full ${
+            selectedButton === 'rejectees' ? active : deactive
+          }`}
+        >
+          Rejectees
+        </button>
           </div>
           <div className="overflow-x-auto">
               <div className="py-2 inline-block min-w-full">

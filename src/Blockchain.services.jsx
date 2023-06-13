@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import { setGlobalState, getGlobalState } from './store'
 import abi from './abis/DominionDAO.json'
+import { report } from 'process'
 
 const { ethereum } = window
 window.web3 = new Web3(ethereum)
@@ -133,10 +134,13 @@ const getProposals = async () => {
   try {
     if (!ethereum) return alert('Please install Metamask')
 
-    const contract = await getEtheriumContract()
-    const proposals = await contract.methods.getProposals().call()
-    setGlobalState('proposals', structuredProposals(proposals))
+      const contract = await getEtheriumContract()
+      console.log(contract)
+      const proposals = await contract.methods.getProposals().call()
+      console.log(proposals)
+      setGlobalState('proposals', structuredProposals(proposals))
   } catch (error) {
+      reportError(error)
     console.log(error)
   }
 }
@@ -165,7 +169,7 @@ const getProposal = async (id) => {
     const proposals = getGlobalState('proposals')
     return proposals.find((proposal) => proposal.id == id)
   } catch (error) {
-    console.log(error)
+    reportError(error)
   }
 }
 

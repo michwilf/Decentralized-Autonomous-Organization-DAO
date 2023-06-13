@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { truncate, useGlobalState, daysRemaining } from '../store'
 import { payoutBeneficiary } from "../Blockchain.services";
@@ -7,68 +7,86 @@ import { toast } from 'react-toastify'
 import Avatar from 'react-avatar';
 
 const Proposals = () => {
-  const [data] = useGlobalState('proposals')
-  const [proposals, setProposals] = useState(data)
-
-  const deactive = `bg-transparent
-  text-blue-600 font-medium text-xs leading-tight
-  uppercase hover:bg-blue-700 focus:bg-blue-700
-  focus:outline-none focus:ring-0 active:bg-blue-600
-  transition duration-150 ease-in-out overflow-hidden
-  border border-blue-600 hover:text-white focus:text-white`
-
-  const active = `bg-blue-600
-  text-white font-medium text-xs leading-tight
-  uppercase hover:bg-blue-700 focus:bg-blue-700
-  focus:outline-none focus:ring-0 active:bg-blue-800
-  transition duration-150 ease-in-out overflow-hidden
-  border border-blue-600`
-
-  const getAll = () => setProposals(data)
-
-  const getOpened = () =>
-    setProposals(
-      data.filter(
-        (proposal) => new Date().getTime() < Number(proposal.duration + '000')
-      )
-    )
-
-  const getClosed = () =>
-    setProposals(
-      data.filter(
-        (proposal) => new Date().getTime() > Number(proposal.duration + '000')
-      )
-    )
-
-  const handlePayout = async (id) => {
-    await payoutBeneficiary(id)
-    toast.success("Beneficiary successfully Paid Out!");
-  }
-
-  return (
-    <div className="flex flex-col p-8">
-      <div className="flex flex-row justify-center items-center" role="group">
-        <button
-          aria-current="page"
-          className={`rounded-l-full px-6 py-2.5 ${active}`}
-          onClick={getAll}
-        >
-          All
-        </button>
-        <button
-          aria-current="page"
-          className={`px-6 py-2.5 ${deactive}`}
-          onClick={getOpened}
-        >
-          Open
-        </button>
-        <button
-          aria-current="page"
-          className={`rounded-r-full px-6 py-2.5 ${deactive}`}
-          onClick={getClosed}
-        >
-          Closed
-        </button>
+    const [data] = useGlobalState('proposals');
+    const [proposals, setProposals] = useState(data);
+    const [activeButton, setActiveButton] = useState('all'); // Track the active button
+  
+    useEffect(() => {
+      setProposals(data);
+    }, [data]);
+  
+    const deactive = `bg-transparent
+    text-blue-600 font-medium text-xs leading-tight
+    uppercase hover:bg-blue-700 focus:bg-blue-700
+    focus:outline-none focus:ring-0 active:bg-blue-600
+    transition duration-150 ease-in-out overflow-hidden
+    border border-blue-600 hover:text-white focus:text-white`;
+  
+    const active = `bg-blue-600
+    text-white font-medium text-xs leading-tight
+    uppercase hover:bg-blue-700 focus:bg-blue-700
+    focus:outline-none focus:ring-0 active:bg-blue-800
+    transition duration-150 ease-in-out overflow-hidden
+    border border-blue-600`;
+  
+    const getAll = () => {
+      setProposals(data);
+      setActiveButton('all'); // Set the active button to 'all'
+    };
+  
+    const getOpened = () => {
+      setProposals(
+        data.filter(
+          (proposal) => new Date().getTime() < Number(proposal.duration + '000')
+        )
+      );
+      setActiveButton('open'); // Set the active button to 'open'
+    };
+  
+    const getClosed = () => {
+      setProposals(
+        data.filter(
+          (proposal) => new Date().getTime() > Number(proposal.duration + '000')
+        )
+      );
+      setActiveButton('closed'); // Set the active button to 'closed'
+    };
+  
+    const handlePayout = async (id) => {
+      await payoutBeneficiary(id);
+      toast.success("Beneficiary successfully Paid Out!");
+    };
+  
+    return (
+      <div className="flex flex-col p-8">
+        <div className="flex flex-row justify-center items-center" role="group">
+          <button
+            aria-current="page"
+            className={`rounded-l-full px-6 py-2.5 ${
+              activeButton === 'all' ? active : deactive
+            }`}
+            onClick={getAll}
+          >
+            All
+          </button>
+          <button
+            aria-current="page"
+            className={`px-6 py-2.5 ${
+              activeButton === 'open' ? active : deactive
+            }`}
+            onClick={getOpened}
+          >
+            Open
+          </button>
+          <button
+            aria-current="page"
+            className={`rounded-r-full px-6 py-2.5 ${
+              activeButton === 'closed' ? active : deactive
+            }`}
+            onClick={getClosed}
+          >
+            Closed
+          </button>
       </div>
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">

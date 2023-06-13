@@ -1,20 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts'
 import { daysRemaining, useGlobalState } from '../store'
 import { toast } from 'react-toastify'
-import { voteOnProposal } from '../Blockchain.services'
+import { getProposal, voteOnProposal } from '../Blockchain.services'
 
 const ProposalDetails = () => {
     const { id } = useParams()
     const [proposal, setProposal] = useState(null)
     const [data, setData] = useState([])
     const [isStakeholder] = useGlobalState('isStakeholder')
-
-
-    useEffect(() => {
-        retrieveProposal()
-    }, [])
 
     const retrieveProposal = async () => {
         await getProposal(id).then((res) => {
@@ -24,6 +19,12 @@ const ProposalDetails = () => {
             ])
         })
     }
+
+    useEffect(() => {
+        retrieveProposal()
+    }, [])
+
+   
 
     const onVote = async (choice) => {
         if (new Date().getTime() > Number(proposal.duration + '000')) {
