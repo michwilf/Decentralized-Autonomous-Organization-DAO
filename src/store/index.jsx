@@ -6,7 +6,7 @@ const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   connectedAccount: '',
   contract: null,
   proposals: [],
-  isStakeholder: true,
+  isStakeholder: false,
   balance: 0,
   mybalance: 0,
 })

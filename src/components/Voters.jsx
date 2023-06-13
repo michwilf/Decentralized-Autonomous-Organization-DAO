@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Avatar from 'react-avatar'
 import { Link, useParams } from 'react-router-dom'
 import { listVoters } from '../Blockchain.services'
+import { truncate } from '../store'
 
 const Voters = () => {
     const [voters, setVoters] = useState([]);
@@ -88,8 +89,8 @@ const Voters = () => {
                               </tr>
                           </thead>
                           <tbody>
-                              {voters.map((voter, i) => (
-                                  <Voter key={i} vote={voter} />
+                              {voters.map((vote, i) => (
+                                  <Voter key={i} vote={vote} />
                                 ))}
                           </tbody>
                       </table>
@@ -116,7 +117,7 @@ const Voter = ({ vote, key }) => {
                                   <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
                                   <div className="flex justify-start items-center space-x-2">
                                       <Avatar className="rounded-full shadow-md text-md" name={vote.voter} size="30" textSizeRatio="75%" round={true} />
-                <span className="ml-2">{truncate(vote.voter, 4,4,11)}</span>
+                <span className="ml-2">{vote.voter}</span>
                                           </div>
                                       </td>
                                       
@@ -124,7 +125,7 @@ const Voter = ({ vote, key }) => {
                                       {timeAgo(vote.timestamp)}
                                   </td>
         <td className="text-sm font-light px-6 py-4 whitespace-nowrap space-x-2">
-            {voter.choosen ? (
+            {vote.choosen ? (
                 <button className="bg-blue-600 inline-block px-6 py-2.5  dark:border
             text-white font-medium text-xs leading-tight uppercase rounded-full
                 dark:shadow-transparent hover:bg-blue-700 hover:dark:border-white transition
